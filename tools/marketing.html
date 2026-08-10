@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Marketing scene renderer</title>
+<script src="../vendor/opentype.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #101216; }
+
+  #scene {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* Backdrops. A seamless studio sweep: wall gradient, floor band, and a soft
+     key light from upper left — enough to read as a photograph of a product
+     without pretending to be one. */
+  #scene[data-scene="warm"]  { background: linear-gradient(178deg, #efe9df 0%, #e3dbd0 52%, #d3c9bc 100%); }
+  #scene[data-scene="stone"] { background: linear-gradient(178deg, #dcdcd8 0%, #cfd0cb 55%, #b9bab4 100%); }
+  #scene[data-scene="dark"]  { background: linear-gradient(178deg, #23252a 0%, #191b1f 55%, #101215 100%); }
+  #scene[data-scene="sage"]  { background: linear-gradient(178deg, #dfe4dc 0%, #cdd5c9 55%, #b4bfb0 100%); }
+
+  .sweep {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(120% 80% at 28% 6%, rgba(255,255,255,0.55), rgba(255,255,255,0) 62%),
+      radial-gradient(90% 70% at 88% 100%, rgba(0,0,0,0.16), rgba(0,0,0,0) 70%);
+    pointer-events: none;
+  }
+  #scene[data-scene="dark"] .sweep {
+    background:
+      radial-gradient(110% 75% at 30% 2%, rgba(255,255,255,0.13), rgba(255,255,255,0) 60%),
+      radial-gradient(90% 70% at 85% 100%, rgba(0,0,0,0.45), rgba(0,0,0,0) 70%);
+  }
+
+  .floor {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 26%;
+    background: linear-gradient(180deg, rgba(0,0,0,0.055), rgba(0,0,0,0.13));
+    border-top: 1px solid rgba(0,0,0,0.055);
+  }
+  #scene[data-scene="dark"] .floor {
+    background: linear-gradient(180deg, rgba(0,0,0,0.28), rgba(0,0,0,0.5));
+    border-top-color: rgba(255,255,255,0.045);
+  }
+
+  .stack { position: relative; display: flex; align-items: flex-end; gap: var(--gap, 5%); }
+
+  .piece { position: relative; flex: 0 0 auto; }
+  .piece .board, .piece svg { display: block; width: 100%; height: 100%; }
+
+  /* Cast shadow away from the key light, plus a tight contact shadow so the
+     board sits on the surface instead of floating above it. */
+  .piece .board {
+    filter:
+      drop-shadow(0 2px 3px rgba(0,0,0,0.24))
+      drop-shadow(14px 26px 34px rgba(0,0,0,0.30));
+  }
+  .contact {
+    position: absolute;
+    left: 4%; right: 4%; bottom: -1.4%;
+    height: 3.2%;
+    background: radial-gradient(closest-side, rgba(0,0,0,0.5), rgba(0,0,0,0) 78%);
+    filter: blur(3px);
+  }
+
+  .label {
+    position: absolute; left: 0; right: 0; top: calc(100% + 22px);
+    text-align: center;
+  }
+  .label b {
+    display: block;
+    font-size: 15px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #3d3833; font-weight: 650;
+  }
+  .label span { font-size: 13px; color: #7a726a; letter-spacing: 0.02em; }
+  #scene[data-scene="dark"] .label b { color: #e7e2d9; }
+  #scene[data-scene="dark"] .label span { color: #9a948b; }
+
+  .headline {
+    position: absolute; left: 0; right: 0; top: 7%;
+    text-align: center;
+  }
+  .headline h1 {
+    margin: 0 0 8px;
+    font-size: 34px; font-weight: 500; letter-spacing: 0.01em; color: #33302c;
+  }
+  .headline p {
+    margin: 0; font-size: 15px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: #8a8177;
+  }
+  #scene[data-scene="dark"] .headline h1 { color: #efe9df; }
+  #scene[data-scene="dark"] .headline p { color: #98918a; }
+</style>
+</head>
+<body>
+<div id="scene"></div>
+
+<script type="module">
+import * as F from '../assets/js/fonts.js';
+import { VERSES } from '../assets/js/verses.js';
+import { applyCollection, COLLECTIONS } from '../assets/js/presets.js';
+import { DEFAULT_DESIGN, BOARD_SIZES, faceSpecs, withDefaults } from '../assets/js/model.js';
+import { toPreviewSvg, layout } from '../assets/js/render.js';
+
+const byId = new Map(VERSES.map((v) => [v.id, v]));
+
+/** Build one design from a compact spec. */
+function buildDesign(spec) {
+  let design = DEFAULT_DESIGN();
+  if (spec.collection) design = applyCollection(design, spec.collection);
+
+  design.verseId = spec.verseId;
+  design.translation = spec.translation || 'kjv';
+
+  if (spec.size) {
+    const size = BOARD_SIZES.find((b) => b.id === spec.size);
+    if (size && size.w) {
+      design.board.sizeId = size.id;
+      design.board.widthMm = size.w;
+      design.board.heightMm = size.h;
+    }
+  }
+
+  // Deep-merge any per-image overrides.
+  const merge = (target, patch) => {
+    for (const [k, v] of Object.entries(patch || {})) {
+      if (v && typeof v === 'object' && !Array.isArray(v)) merge((target[k] ??= {}), v);
+      else target[k] = v;
+    }
+  };
+  merge(design, spec.overrides);
+  return withDefaults(design);
+}
+
+/**
+ * Renders a scene. Called by tools/render-marketing.mjs.
+ * Returns once every font is parsed and the DOM is settled.
+ */
+window.renderScene = async (config) => {
+  const scene = document.getElementById('scene');
+  scene.dataset.scene = config.scene || 'warm';
+  scene.style.width = `${config.width}px`;
+  scene.style.height = `${config.height}px`;
+  scene.textContent = '';
+
+  scene.append(Object.assign(document.createElement('div'), { className: 'sweep' }));
+  if (config.floor !== false) {
+    scene.append(Object.assign(document.createElement('div'), { className: 'floor' }));
+  }
+
+  if (config.headline) {
+    const head = document.createElement('div');
+    head.className = 'headline';
+    head.innerHTML = `<h1></h1><p></p>`;
+    head.querySelector('h1').textContent = config.headline.title;
+    head.querySelector('p').textContent = config.headline.sub || '';
+    scene.append(head);
+  }
+
+  const stack = document.createElement('div');
+  stack.className = 'stack';
+  scene.append(stack);
+
+  const designs = config.pieces.map(buildDesign);
+  await F.loadManifest();
+  await F.preload(designs.flatMap(faceSpecs));
+
+  // Scale so the tallest board fills the requested share of the frame, then
+  // clamp so the whole row still fits across it. Every piece keeps its true
+  // relative size — that is the point of a range shot, and it is the only
+  // honest way to show a coaster next to a twelve-inch plaque.
+  const gapPx = config.gapPx ?? 46;
+  const tallest = Math.max(...designs.map((d) => d.board.heightMm));
+  const widthUnits = designs.reduce((sum, d) => sum + d.board.widthMm, 0) / tallest;
+  const usableWidth = config.width * (config.frameFill ?? 0.9) - gapPx * (designs.length - 1);
+
+  const targetPx = Math.min(config.height * (config.fill ?? 0.68), usableWidth / widthUnits);
+  stack.style.setProperty('--gap', `${gapPx}px`);
+
+  designs.forEach((design, i) => {
+    const spec = config.pieces[i];
+    const piece = document.createElement('div');
+    piece.className = 'piece';
+    // Both dimensions are set explicitly from the board's true proportions.
+    // Leaving the width to intrinsic SVG sizing collapses the box and clips the
+    // artwork as soon as the row mixes aspect ratios.
+    piece.style.height = `${(design.board.heightMm / tallest) * targetPx}px`;
+    piece.style.width = `${(design.board.widthMm / tallest) * targetPx}px`;
+
+    const board = document.createElement('div');
+    board.className = 'board';
+    board.style.height = '100%';
+    board.innerHTML = toPreviewSvg(design, byId.get(design.verseId), { seed: spec.seed ?? 5 + i * 3 });
+    piece.append(board);
+
+    piece.append(Object.assign(document.createElement('div'), { className: 'contact' }));
+
+    if (spec.label) {
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.innerHTML = '<b></b><span></span>';
+      label.querySelector('b').textContent = spec.label;
+      label.querySelector('span').textContent = spec.sublabel || '';
+      piece.append(label);
+    }
+
+    stack.append(piece);
+  });
+
+  if (config.offset) stack.style.transform = `translateY(${config.offset})`;
+
+  await document.fonts.ready;
+
+  // Report any layout complaint back to the driver. A marketing image showing
+  // a plaque the app would flag as broken is worse than no image.
+  return designs.flatMap((d, i) =>
+    layout(d, byId.get(d.verseId)).warnings.map((w) => `piece ${i + 1} (${d.verseId}): ${w}`),
+  );
+};
+
+window.__sceneReady = true;
+</script>
+</body>
+</html>

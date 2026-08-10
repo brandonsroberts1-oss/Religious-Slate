@@ -1,0 +1,711 @@
+{
+  "generated": "2026-08-10",
+  "families": [
+    {
+      "id": "cinzel",
+      "family": "Cinzel",
+      "group": "Inscriptional",
+      "roles": [
+        "verse",
+        "word",
+        "reference",
+        "accent"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "cinzel-400.ttf"
+        },
+        {
+          "weight": 600,
+          "italic": false,
+          "file": "cinzel-600.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "cinzel-700.ttf"
+        },
+        {
+          "weight": 900,
+          "italic": false,
+          "file": "cinzel-900.ttf"
+        }
+      ],
+      "note": "Roman monument capitals. Caps only."
+    },
+    {
+      "id": "cinzel-decorative",
+      "family": "Cinzel Decorative",
+      "group": "Inscriptional",
+      "roles": [
+        "accent",
+        "word"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "cinzel-decorative-400.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "cinzel-decorative-700.ttf"
+        },
+        {
+          "weight": 900,
+          "italic": false,
+          "file": "cinzel-decorative-900.ttf"
+        }
+      ]
+    },
+    {
+      "id": "forum",
+      "family": "Forum",
+      "group": "Inscriptional",
+      "roles": [
+        "accent",
+        "word"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "forum-400.ttf"
+        }
+      ]
+    },
+    {
+      "id": "marcellus",
+      "family": "Marcellus",
+      "group": "Inscriptional",
+      "roles": [
+        "verse",
+        "accent"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "marcellus-400.ttf"
+        }
+      ]
+    },
+    {
+      "id": "ibm-plex-mono",
+      "family": "IBM Plex Mono",
+      "group": "Mono",
+      "roles": [
+        "reference"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "ibm-plex-mono-400.ttf"
+        },
+        {
+          "weight": 500,
+          "italic": false,
+          "file": "ibm-plex-mono-500.ttf"
+        },
+        {
+          "weight": 600,
+          "italic": false,
+          "file": "ibm-plex-mono-600.ttf"
+        }
+      ]
+    },
+    {
+      "id": "jetbrains-mono",
+      "family": "JetBrains Mono",
+      "group": "Mono",
+      "roles": [
+        "reference"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "jetbrains-mono-400.ttf"
+        },
+        {
+          "weight": 500,
+          "italic": false,
+          "file": "jetbrains-mono-500.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "jetbrains-mono-700.ttf"
+        }
+      ],
+      "note": "Matches the sample reference line."
+    },
+    {
+      "id": "roboto-mono",
+      "family": "Roboto Mono",
+      "group": "Mono",
+      "roles": [
+        "reference"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "roboto-mono-400.ttf"
+        },
+        {
+          "weight": 500,
+          "italic": false,
+          "file": "roboto-mono-500.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "roboto-mono-700.ttf"
+        }
+      ]
+    },
+    {
+      "id": "space-mono",
+      "family": "Space Mono",
+      "group": "Mono",
+      "roles": [
+        "reference"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "space-mono-400.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "space-mono-700.ttf"
+        }
+      ]
+    },
+    {
+      "id": "anton",
+      "family": "Anton",
+      "group": "Sans",
+      "roles": [
+        "word"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "anton-400.ttf"
+        }
+      ],
+      "note": "Tall and condensed. Great for long subject words."
+    },
+    {
+      "id": "archivo-black",
+      "family": "Archivo Black",
+      "group": "Sans",
+      "roles": [
+        "word"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "archivo-black-400.ttf"
+        }
+      ],
+      "note": "Heavy grotesque — matches the sample badge word."
+    },
+    {
+      "id": "barlow-condensed",
+      "family": "Barlow Condensed",
+      "group": "Sans",
+      "roles": [
+        "word",
+        "reference"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "barlow-condensed-400.ttf"
+        },
+        {
+          "weight": 500,
+          "italic": false,
+          "file": "barlow-condensed-500.ttf"
+        },
+        {
+          "weight": 600,
+          "italic": false,
+          "file": "barlow-condensed-600.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "barlow-condensed-700.ttf"
+        }
+      ]
+    },
+    {
+      "id": "bebas-neue",
+      "family": "Bebas Neue",
+      "group": "Sans",
+      "roles": [
+        "word",
+        "reference"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "bebas-neue-400.ttf"
+        }
+      ]
+    },
+    {
+      "id": "inter",
+      "family": "Inter",
+      "group": "Sans",
+      "roles": [
+        "word",
+        "reference",
+        "verse"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "inter-400.ttf"
+        },
+        {
+          "weight": 600,
+          "italic": false,
+          "file": "inter-600.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "inter-700.ttf"
+        },
+        {
+          "weight": 800,
+          "italic": false,
+          "file": "inter-800.ttf"
+        },
+        {
+          "weight": 900,
+          "italic": false,
+          "file": "inter-900.ttf"
+        }
+      ]
+    },
+    {
+      "id": "league-spartan",
+      "family": "League Spartan",
+      "group": "Sans",
+      "roles": [
+        "word"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "league-spartan-400.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "league-spartan-700.ttf"
+        },
+        {
+          "weight": 900,
+          "italic": false,
+          "file": "league-spartan-900.ttf"
+        }
+      ]
+    },
+    {
+      "id": "montserrat",
+      "family": "Montserrat",
+      "group": "Sans",
+      "roles": [
+        "word",
+        "reference",
+        "verse"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "montserrat-400.ttf"
+        },
+        {
+          "weight": 600,
+          "italic": false,
+          "file": "montserrat-600.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "montserrat-700.ttf"
+        },
+        {
+          "weight": 800,
+          "italic": false,
+          "file": "montserrat-800.ttf"
+        },
+        {
+          "weight": 900,
+          "italic": false,
+          "file": "montserrat-900.ttf"
+        }
+      ]
+    },
+    {
+      "id": "oswald",
+      "family": "Oswald",
+      "group": "Sans",
+      "roles": [
+        "word",
+        "reference"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "oswald-400.ttf"
+        },
+        {
+          "weight": 500,
+          "italic": false,
+          "file": "oswald-500.ttf"
+        },
+        {
+          "weight": 600,
+          "italic": false,
+          "file": "oswald-600.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "oswald-700.ttf"
+        }
+      ]
+    },
+    {
+      "id": "cormorant-infant",
+      "family": "Cormorant Infant",
+      "group": "Script",
+      "roles": [
+        "accent",
+        "verse"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "cormorant-infant-400.ttf"
+        },
+        {
+          "weight": 600,
+          "italic": false,
+          "file": "cormorant-infant-600.ttf"
+        }
+      ]
+    },
+    {
+      "id": "great-vibes",
+      "family": "Great Vibes",
+      "group": "Script",
+      "roles": [
+        "accent",
+        "verse"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "great-vibes-400.ttf"
+        }
+      ],
+      "note": "Keep above ~14mm — hairlines can drop out on slate."
+    },
+    {
+      "id": "parisienne",
+      "family": "Parisienne",
+      "group": "Script",
+      "roles": [
+        "accent"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "parisienne-400.ttf"
+        }
+      ]
+    },
+    {
+      "id": "cardo",
+      "family": "Cardo",
+      "group": "Serif",
+      "roles": [
+        "verse"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "cardo-400.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "cardo-700.ttf"
+        }
+      ],
+      "note": "Designed for classical and biblical texts."
+    },
+    {
+      "id": "cormorant-garamond",
+      "family": "Cormorant Garamond",
+      "group": "Serif",
+      "roles": [
+        "verse",
+        "accent"
+      ],
+      "faces": [
+        {
+          "weight": 300,
+          "italic": false,
+          "file": "cormorant-garamond-300.ttf"
+        },
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "cormorant-garamond-400.ttf"
+        },
+        {
+          "weight": 500,
+          "italic": false,
+          "file": "cormorant-garamond-500.ttf"
+        },
+        {
+          "weight": 600,
+          "italic": false,
+          "file": "cormorant-garamond-600.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "cormorant-garamond-700.ttf"
+        },
+        {
+          "weight": 400,
+          "italic": true,
+          "file": "cormorant-garamond-400i.ttf"
+        }
+      ],
+      "note": "High contrast, elegant. Engraves best at larger sizes."
+    },
+    {
+      "id": "crimson-pro",
+      "family": "Crimson Pro",
+      "group": "Serif",
+      "roles": [
+        "verse"
+      ],
+      "faces": [
+        {
+          "weight": 300,
+          "italic": false,
+          "file": "crimson-pro-300.ttf"
+        },
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "crimson-pro-400.ttf"
+        },
+        {
+          "weight": 600,
+          "italic": false,
+          "file": "crimson-pro-600.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "crimson-pro-700.ttf"
+        }
+      ]
+    },
+    {
+      "id": "eb-garamond",
+      "family": "EB Garamond",
+      "group": "Serif",
+      "roles": [
+        "verse",
+        "reference",
+        "accent"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "eb-garamond-400.ttf"
+        },
+        {
+          "weight": 500,
+          "italic": false,
+          "file": "eb-garamond-500.ttf"
+        },
+        {
+          "weight": 600,
+          "italic": false,
+          "file": "eb-garamond-600.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "eb-garamond-700.ttf"
+        },
+        {
+          "weight": 400,
+          "italic": true,
+          "file": "eb-garamond-400i.ttf"
+        }
+      ],
+      "note": "Closest match to the original sample plaque."
+    },
+    {
+      "id": "libre-baskerville",
+      "family": "Libre Baskerville",
+      "group": "Serif",
+      "roles": [
+        "verse",
+        "reference"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "libre-baskerville-400.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "libre-baskerville-700.ttf"
+        },
+        {
+          "weight": 400,
+          "italic": true,
+          "file": "libre-baskerville-400i.ttf"
+        }
+      ],
+      "note": "Sturdy. Very forgiving on slate."
+    },
+    {
+      "id": "lora",
+      "family": "Lora",
+      "group": "Serif",
+      "roles": [
+        "verse",
+        "reference"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "lora-400.ttf"
+        },
+        {
+          "weight": 500,
+          "italic": false,
+          "file": "lora-500.ttf"
+        },
+        {
+          "weight": 600,
+          "italic": false,
+          "file": "lora-600.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "lora-700.ttf"
+        }
+      ]
+    },
+    {
+      "id": "playfair-display",
+      "family": "Playfair Display",
+      "group": "Serif",
+      "roles": [
+        "verse",
+        "word",
+        "accent"
+      ],
+      "faces": [
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "playfair-display-400.ttf"
+        },
+        {
+          "weight": 500,
+          "italic": false,
+          "file": "playfair-display-500.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "playfair-display-700.ttf"
+        },
+        {
+          "weight": 900,
+          "italic": false,
+          "file": "playfair-display-900.ttf"
+        },
+        {
+          "weight": 400,
+          "italic": true,
+          "file": "playfair-display-400i.ttf"
+        }
+      ]
+    },
+    {
+      "id": "spectral",
+      "family": "Spectral",
+      "group": "Serif",
+      "roles": [
+        "verse"
+      ],
+      "faces": [
+        {
+          "weight": 300,
+          "italic": false,
+          "file": "spectral-300.ttf"
+        },
+        {
+          "weight": 400,
+          "italic": false,
+          "file": "spectral-400.ttf"
+        },
+        {
+          "weight": 600,
+          "italic": false,
+          "file": "spectral-600.ttf"
+        },
+        {
+          "weight": 700,
+          "italic": false,
+          "file": "spectral-700.ttf"
+        }
+      ]
+    }
+  ]
+}

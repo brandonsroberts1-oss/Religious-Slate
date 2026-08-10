@@ -1,0 +1,4 @@
+node_modules/
+tools/.corpora/
+*.log
+.DS_Store
