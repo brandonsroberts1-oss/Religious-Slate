@@ -5,7 +5,7 @@
   "description": "Design scripture slate plaques and export laser-ready SVG for xTool.",
   "type": "module",
   "scripts": {
-    "start": "node tools/serve.mjs",
+    "start": "node tools/launch.mjs",
     "serve": "node tools/serve.mjs",
     "test": "node tools/smoke.mjs",
     "verses": "node tools/build-verses.mjs",

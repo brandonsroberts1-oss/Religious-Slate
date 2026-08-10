@@ -15,13 +15,39 @@ screen.
 
 ## Running it
 
+**Double-click the launcher for your machine:**
+
+| | |
+|---|---|
+| macOS | `Launch Slate Studio.command` |
+| Windows | `Launch Slate Studio.bat` |
+| Linux | `launch.sh` |
+
+It starts the studio and opens your browser. Closing the window stops it. If
+the studio is already running it reuses that one rather than starting a second
+copy, and if the port is busy it moves to the next free one.
+
+The only requirement is [Node.js](https://nodejs.org) 18 or newer — the
+launchers check for it, look in the usual install locations when it is not on
+`PATH` (Homebrew, nvm, fnm, Volta, the Windows installer), and say plainly what
+to install if it is genuinely missing.
+
+> **macOS, first run.** Files downloaded from the internet are quarantined, so
+> Gatekeeper may refuse to run the `.command`. Right-click it → **Open** →
+> **Open**, once. If Finder opens it in a text editor instead of running it,
+> the executable bit was lost in transit: `chmod +x "Launch Slate Studio.command"`.
+
+From a terminal, equivalently:
+
 ```bash
-node tools/serve.mjs          # → http://localhost:4173
+npm start                     # launch + open a browser
+node tools/serve.mjs          # just the server, no browser
 ```
 
-No build step and no install: it is plain ES modules, and every font is
-bundled. It does need to be *served* rather than opened as a `file://` page —
-ES modules and the font loading are both blocked by the file:// origin rules.
+No build step and no install: plain ES modules, every font bundled. It does
+need to be *served* rather than opened as a `file://` page — ES modules and the
+font loading are both blocked by the file:// origin rules, which is the whole
+reason there is a launcher.
 
 Optional, for the tooling only:
 
@@ -177,6 +203,9 @@ listing copy.
 ## Repository
 
 ```
+Launch Slate Studio.command   double-click launcher (macOS)
+Launch Slate Studio.bat       double-click launcher (Windows)
+launch.sh                     launcher (Linux, and the shared implementation)
 index.html               the editor
 assets/js/
   fonts.js               font book: parsing, metrics, text→outline
@@ -190,6 +219,7 @@ assets/js/
 assets/fonts/            27 families, 81 static TTFs, Latin-subset (3.9 MB)
 vendor/opentype.min.js   font parsing
 tools/
+  launch.mjs             port selection, browser opening, shutdown
   serve.mjs              static server
   smoke.mjs              16 checks in a headless browser
   build-verses.mjs       verifies verses against KJV/WEB, emits verses.js

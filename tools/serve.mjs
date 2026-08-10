@@ -10,7 +10,7 @@
  */
 import http from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -29,9 +29,22 @@ const TYPES = {
   '.webp': 'image/webp',
 };
 
-const server = http.createServer(async (req, res) => {
+/** A marker the launcher probes to tell our server apart from someone else's. */
+export const SERVER_ID = 'slate-plaque-studio';
+
+export function createServer() {
+  return http.createServer(handle);
+}
+
+async function handle(req, res) {
   try {
     const url = new URL(req.url, 'http://localhost');
+
+    if (url.pathname === '/__id') {
+      res.writeHead(200, { 'Content-Type': 'text/plain' }).end(SERVER_ID);
+      return;
+    }
+
     const rel = decodeURIComponent(url.pathname).replace(/^\/+/, '') || 'index.html';
     const file = path.join(ROOT, rel);
 
@@ -53,8 +66,35 @@ const server = http.createServer(async (req, res) => {
   } catch {
     res.writeHead(404, { 'Content-Type': 'text/plain' }).end('Not found');
   }
-});
+}
 
-server.listen(PORT, () => {
-  console.log(`Slate Plaque Studio → http://localhost:${PORT}`);
-});
+/**
+ * Listen on `port`, or on the next free port after it.
+ *
+ * Falling back matters for a double-clickable launcher: a port left occupied by
+ * a previous run should not greet a non-technical user with EADDRINUSE.
+ */
+export function listen(port = PORT, attempts = 20) {
+  return new Promise((resolve, reject) => {
+    const server = createServer();
+    let remaining = attempts;
+    let current = port;
+
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE' && remaining-- > 0) {
+        server.listen(++current);
+      } else {
+        reject(err);
+      }
+    });
+
+    server.on('listening', () => resolve({ server, port: current }));
+    server.listen(current);
+  });
+}
+
+// Only self-start when run directly, so tools/launch.mjs can import it.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const { port } = await listen(PORT);
+  console.log(`Slate Plaque Studio → http://localhost:${port}`);
+}
