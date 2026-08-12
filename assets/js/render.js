@@ -10,7 +10,8 @@
 
 import * as F from './fonts.js';
 import { rectRing, roundedRect, divider, frame as framePath, bar } from './shapes.js';
-import { applyTransform, resolveText } from './model.js';
+import { applyTransform, resolveText, SYMBOL_SLOTS } from './model.js';
+import { placeSymbol, symbolWidth, symbol as symbolDef } from './symbols.js';
 
 const round = (n) => Math.round(n * 1000) / 1000;
 const esc = (s) =>
@@ -197,6 +198,40 @@ export function layout(design, verse) {
     } else if (!font) {
       warnings.push('badge: font not loaded');
     }
+  }
+
+  // Symbol — slotted into the stack rather than appended, so it can sit above
+  // the verse, under the rule, or below the subject word.
+  const sym = design.symbol;
+  if (sym && sym.on) {
+    const width = symbolWidth(sym.id, sym.sizeMm);
+    if (width > contentW) warnings.push('Symbol is wider than the content area — reduce its size.');
+
+    const block = {
+      key: 'symbol',
+      height: sym.sizeMm,
+      gapAfter: sym.gapAfter || 0,
+      draw(top) {
+        ops.push({
+          id: 'symbol',
+          kind: 'fill',
+          rule: 'nonzero',
+          d: placeSymbol(sym.id, cx, top, sym.sizeMm),
+        });
+      },
+    };
+
+    const slot = SYMBOL_SLOTS.find((s) => s.id === sym.slot) || SYMBOL_SLOTS[0];
+    let index = 0;
+    if (slot.after) {
+      const found = blocks.findIndex((b) => b.key === slot.after);
+      // A slot whose anchor is switched off falls through to the end, which is
+      // where the eye expects it rather than jumping to the top.
+      index = found === -1 ? blocks.length : found + 1;
+    }
+
+    blocks.splice(index, 0, block);
+    if (index > 0) blocks[index - 1].gapAfter += sym.gapBefore || 0;
   }
 
   // ── Stack the blocks ─────────────────────────────────────────────────────

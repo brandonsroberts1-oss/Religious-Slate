@@ -120,6 +120,8 @@ the engrave geometry.
   radius, horizontal and vertical padding, and whether it hugs the word, holds
   a fixed width, or spans the full content width. Alternative subject words for
   the current verse appear as one-click chips.
+- **Symbol** — a cross, star, dove or one of 26 others, placed anywhere in the
+  stack. Height is set in millimetres and is exact.
 - **Eyebrow / Footer** — optional lines for names, dates, "Established 2019".
 - **Border frame** — single or double rule inset from the board edge.
 - **Board & layout** — blank size, custom dimensions, margins, and whether the
@@ -130,8 +132,13 @@ Leave a text field blank and it follows the selected verse; type in it and your
 wording wins. **Reset** puts it back on the verse.
 
 The app warns when content runs past a margin, when the subject word is wider
-than its box, when a verse will not fit the text width, and when a bottom-
-anchored footer has drifted under the stack.
+than its box, when a verse will not fit the text width, when a symbol is wider
+than the content area, and when a bottom-anchored footer has drifted under the
+stack.
+
+**Reset** in the toolbar restores every setting to its default in one click. It
+does not ask first — it offers an Undo instead, which is the right trade when
+wanting the defaults back is the common case and a misclick is the rare one.
 
 ### Batch export
 
@@ -175,6 +182,40 @@ node tools/build-verses.mjs
 
 ---
 
+## Symbols
+
+![The symbol library](marketing/symbol-library.jpg)
+
+26 symbols across crosses, Christian, Jewish, universal and other traditions.
+They are **constructed, not traced** — every one is composed from circles, arcs
+and polygons, so it is exactly symmetrical, scales without artefacts, and
+carries no licensing baggage from someone else's clipart.
+
+Two constraints shape the whole library:
+
+- **Only absolute `M`, `L`, `C`, `Q`, `Z` — never an arc command.** The exporter
+  bakes absolute coordinates rather than emitting transforms, and those five
+  commands take nothing but coordinate pairs, so scaling a symbol is a uniform
+  map over its numbers. An arc's radii and flags would not survive that. The
+  `arc()` helper emits cubics for exactly this reason, and the smoke test fails
+  the build if any other command appears.
+
+- **Solid shapes, wound consistently and filled `nonzero`.** A union is then
+  just concatenation, and a ring's reversed inner contour punches its hole
+  while leaving anything else crossing it solid — which is what lets a Celtic
+  cross's arms pass through its ring. Bold closed shapes are also what slate
+  wants: engraving is a texture, not ink, and fine interior linework vanishes
+  into the grain.
+
+Each symbol's bounding box is **measured**, by solving each curve's derivative
+rather than sampling it, so a height of 24 mm produces 24 mm of engraving. The
+hand-estimated boxes this replaced were out by up to 25% on some symbols. The
+test asserts placement to 0.05 mm using the browser's own `getBBox`, which is
+an independent measurement from the maths being tested.
+
+Adding one is a single entry in `assets/js/symbols.js`; the picker, exporter
+and library sheet pick it up automatically.
+
 ## Collections
 
 Eight house styles, each a saleable line with its own typographic voice and its
@@ -210,6 +251,7 @@ index.html               the editor
 assets/js/
   fonts.js               font book: parsing, metrics, text→outline
   shapes.js              rules, rings, frames
+  symbols.js             26 constructed symbols + exact path bounds
   model.js               the design document and its defaults
   render.js              layout engine + SVG output (preview, flat, export)
   presets.js             the eight collections
@@ -227,8 +269,9 @@ tools/
   fetch-fonts.mjs        downloads the font set
   subset-fonts.sh        trims it 13 MB → 3.9 MB
   marketing.html         scene template for renders
+  symbol-sheet.html      the symbol library sheet
   render-marketing.mjs   produces marketing/
-marketing/               eight renders, regenerable
+marketing/               ten renders, regenerable
 docs/                    licensing, product line
 ```
 

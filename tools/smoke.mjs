@@ -126,6 +126,92 @@ const idClash = await page.evaluate(() => {
 });
 check('two previews share no SVG ids', idClash.length === 0, idClash.slice(0, 4).join(', '));
 
+// Symbols must survive the exporter's no-transform contract. Scaling is a
+// uniform map over coordinate pairs, which only holds while every command is
+// absolute and takes nothing but coordinates — one stray arc would break it.
+const symbolSyntax = await page.evaluate(async () => {
+  const { SYMBOLS } = await import('/assets/js/symbols.js');
+  const bad = [];
+  for (const s of SYMBOLS) {
+    const commands = [...s.d.matchAll(/[A-Za-z]/g)].map((m) => m[0]);
+    const illegal = [...new Set(commands.filter((c) => !'MLCQZ'.includes(c)))];
+    if (illegal.length) bad.push(`${s.id}: ${illegal.join('')}`);
+    if (!/^M/.test(s.d.trim())) bad.push(`${s.id}: does not start with M`);
+    if (!(s.w > 0 && s.h > 0)) bad.push(`${s.id}: bad box`);
+    if (/NaN|undefined/.test(s.d)) bad.push(`${s.id}: NaN in path`);
+  }
+  return bad;
+});
+check('every symbol uses only absolute M/L/C/Q/Z', symbolSyntax.length === 0, symbolSyntax.slice(0, 4).join(', '));
+
+// A placed symbol must land at exactly the requested height, centred on its
+// anchor and seated on its top edge. Measured with the browser's own getBBox
+// rather than our bounds maths, so the two have to agree independently.
+const placement = await page.evaluate(async () => {
+  const { SYMBOLS, placeSymbol, symbolWidth } = await import('/assets/js/symbols.js');
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  svg.append(path);
+  document.body.append(svg);
+
+  const out = [];
+  for (const s of SYMBOLS) {
+    path.setAttribute('d', placeSymbol(s.id, 100, 20, 40));
+    const box = path.getBBox();
+    if (Math.abs(box.height - 40) > 0.05) out.push(`${s.id}: height ${box.height.toFixed(2)}`);
+    if (Math.abs(box.y - 20) > 0.05) out.push(`${s.id}: top ${box.y.toFixed(2)}`);
+    if (Math.abs(box.x + box.width / 2 - 100) > 0.05) out.push(`${s.id}: centre off`);
+    if (Math.abs(box.width - symbolWidth(s.id, 40)) > 0.05) out.push(`${s.id}: width ${box.width.toFixed(2)}`);
+  }
+  svg.remove();
+  return out;
+});
+check('symbols place at exactly the requested size and centre', placement.length === 0, placement.slice(0, 4).join(', '));
+
+// The symbol has to reach the exported file, not just the preview.
+const symbolExport = await page.evaluate(async () => {
+  const s = window.__studio;
+  const d = s.clone(s.state.design);
+  Object.assign(d.symbol, { on: true, id: 'star-of-david', sizeMm: 30, slot: 'top' });
+  const svg = s.toExportSvg(d, s.VERSES.find((v) => v.id === d.verseId));
+  return { has: /id="symbol"/.test(svg), transforms: /transform="/.test(svg), arcs: /[Aa]\d/.test(svg) };
+});
+check('symbol reaches the export with no transforms', symbolExport.has && !symbolExport.transforms, JSON.stringify(symbolExport));
+
+// Reset, and its undo.
+const resetBehaviour = await page.evaluate(async () => {
+  const s = window.__studio;
+  s.state.design.verse.sizeMm = 44;
+  s.state.design.badge.box.thicknessMm = 5.5;
+  s.state.design.verseId = 'psalm-23-1';
+  s.update();
+
+  document.getElementById('btn-reset').click();
+  const after = {
+    size: s.state.design.verse.sizeMm,
+    thickness: s.state.design.badge.box.thicknessMm,
+    verse: s.state.design.verseId,
+  };
+
+  const undo = document.querySelector('#toast button');
+  const hadUndo = !!undo;
+  if (undo) undo.click();
+
+  return {
+    after,
+    hadUndo,
+    restored: s.state.design.verse.sizeMm,
+    defaults: { size: s.DEFAULT_DESIGN().verse.sizeMm, verse: s.DEFAULT_DESIGN().verseId },
+  };
+});
+check('reset restores every default in one click',
+  resetBehaviour.after.size === resetBehaviour.defaults.size &&
+    resetBehaviour.after.thickness === 1.6 &&
+    resetBehaviour.after.verse === resetBehaviour.defaults.verse,
+  JSON.stringify(resetBehaviour.after));
+check('reset offers a working undo', resetBehaviour.hadUndo && resetBehaviour.restored === 44,
+  `restored ${resetBehaviour.restored}`);
+
 // Every font in the book must parse and outline.
 const fontIssues = await page.evaluate(async () => {
   const s = window.__studio;

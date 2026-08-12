@@ -32,6 +32,16 @@ export const DIVIDER_STYLES = [
   { id: 'cross', label: 'Cross' },
 ];
 
+/** Where a symbol can sit in the vertical stack. */
+export const SYMBOL_SLOTS = [
+  { id: 'top', label: 'Above everything', after: null },
+  { id: 'after-eyebrow', label: 'Below the eyebrow', after: 'eyebrow' },
+  { id: 'after-verse', label: 'Below the verse', after: 'verse' },
+  { id: 'after-rule', label: 'Below the divider', after: 'rule' },
+  { id: 'after-reference', label: 'Below the reference', after: 'reference' },
+  { id: 'bottom', label: 'Below the subject word', after: 'badge' },
+];
+
 export const TRANSFORMS = [
   { id: 'none', label: 'As typed' },
   { id: 'upper', label: 'UPPERCASE' },
@@ -76,6 +86,15 @@ export const DEFAULT_DESIGN = () => ({
   layout: { anchor: 'custom', topMm: 55 },
 
   frame: { on: false, insetMm: 8, thicknessMm: 1.2, radiusMm: 0, style: 'single', gapMm: 2.5 },
+
+  symbol: {
+    on: false,
+    id: 'cross-latin',
+    sizeMm: 22,
+    slot: 'top', // where it sits in the stack — see SYMBOL_SLOTS
+    gapBefore: 0,
+    gapAfter: 12,
+  },
 
   eyebrow: {
     on: false,

@@ -288,6 +288,54 @@ input[type="range"]::-moz-range-thumb {
 
 .swaps { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 
+/* ── Symbol picker ─────────────────────────────────────────────────────── */
+
+.symbol-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+
+.symbol-swatch {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  background: var(--panel-2);
+  color: var(--ink-dim);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.symbol-swatch svg { width: 100%; height: 100%; }
+.symbol-swatch:hover { border-color: #414855; color: var(--ink); }
+.symbol-swatch[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ── Toast ─────────────────────────────────────────────────────────────── */
+
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px 9px 15px;
+  background: #2b3038;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+  font-size: 12.5px;
+  white-space: nowrap;
+  z-index: 5;
+}
+.toast[hidden] { display: none; }
+
 .warnings { margin: 0 14px 14px; }
 .warn {
   display: flex; gap: 7px; align-items: flex-start;

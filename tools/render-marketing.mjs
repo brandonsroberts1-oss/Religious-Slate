@@ -118,6 +118,26 @@ const SCENES = [
     ],
   },
   {
+    file: 'pilgrim-symbol.jpg',
+    ...PORTRAIT,
+    scene: 'stone',
+    fill: 0.8,
+    pieces: [
+      {
+        verseId: 'psalm-119-105',
+        collection: 'pilgrim',
+        seed: 41,
+        overrides: {
+          symbol: { on: true, id: 'cross-celtic', sizeMm: 30, slot: 'top', gapAfter: 16 },
+          verse: { sizeMm: 12, gapAfter: 13 },
+          reference: { gapAfter: 26 },
+          badge: { text: 'THE LAMP', sizeMm: 13 },
+          layout: { anchor: 'custom', topMm: 38 },
+        },
+      },
+    ],
+  },
+  {
     file: 'collection-lineup.jpg',
     ...WIDE,
     scene: 'warm',
@@ -205,6 +225,18 @@ async function main() {
     await page.locator('#scene').screenshot({ path: target, type: 'jpeg', quality: 92 });
     console.log(`✓ ${scene.file}  ${scene.width}×${scene.height} @${SCALE}x`);
   }
+
+  // The symbol library, as a sheet usable for listing dropdowns and proofs.
+  await page.setViewportSize({ width: 1500, height: 1200 });
+  await page.goto(`${BASE}/tools/symbol-sheet.html`, { waitUntil: 'networkidle' });
+  await page.waitForFunction(() => window.__sheetReady, null, { timeout: 20000 });
+  await page.waitForTimeout(200);
+  await page.locator('#sheet').screenshot({
+    path: path.join(OUT, 'symbol-library.jpg'),
+    type: 'jpeg',
+    quality: 92,
+  });
+  console.log(`✓ symbol-library.jpg  @${SCALE}x`);
 
   await browser.close();
 

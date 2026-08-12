@@ -93,6 +93,21 @@ files is the courteous and safest thing to do.
 
 ---
 
+## Symbols — original work
+
+The 26 symbols in `assets/js/symbols.js` are constructed from primitives in
+this repository, not traced from anyone's artwork and not imported from an icon
+set. There is no third-party licence attached to them and nothing to attribute.
+
+That is a deliberate choice rather than a stylistic one. Religious symbol packs
+on stock sites are routinely licensed for "personal use" or forbid use in
+"products for resale" — precisely what a plaque business does. Building the
+shapes from circles and polygons sidesteps that question entirely.
+
+The symbols themselves are ancient and in the public domain as designs; what a
+licence could ever attach to is a *particular drawing* of one. These drawings
+are yours.
+
 ## Code
 
 | Component | Licence |

@@ -11,9 +11,10 @@ import * as F from './fonts.js';
 import { VERSES } from './verses.js';
 import { COLLECTIONS, applyCollection } from './presets.js';
 import {
-  DEFAULT_DESIGN, BOARD_SIZES, DIVIDER_STYLES, TRANSFORMS,
+  DEFAULT_DESIGN, BOARD_SIZES, DIVIDER_STYLES, TRANSFORMS, SYMBOL_SLOTS,
   withDefaults, clone, faceSpecs, resolveText,
 } from './model.js';
+import { SYMBOLS, SYMBOL_GROUPS, symbolViewBox } from './symbols.js';
 import { layout, toExportSvg, toPreviewSvg, toFlatSvg } from './render.js';
 import { makeZip } from './zip.js';
 
@@ -102,6 +103,18 @@ const SECTIONS = [
       { type: 'range', path: 'badge.box.padXMm', label: 'Pad — sides', min: 0, max: 40, step: 0.5, unit: 'mm' },
       { type: 'range', path: 'badge.box.padYMm', label: 'Pad — top/bottom', min: 0, max: 40, step: 0.5, unit: 'mm' },
       { type: 'range', path: 'badge.box.radiusMm', label: 'Corner radius', min: 0, max: 20, step: 0.5, unit: 'mm' },
+    ],
+  },
+  {
+    id: 'symbol', title: 'Symbol',
+    controls: [
+      { type: 'toggle', path: 'symbol.on', label: 'Show' },
+      { type: 'symbols' },
+      { type: 'range', path: 'symbol.sizeMm', label: 'Height', min: 4, max: 140, step: 0.5, unit: 'mm' },
+      { type: 'select', path: 'symbol.slot', label: 'Position', options: SYMBOL_SLOTS.map((s) => opt(s.id, s.label)) },
+      { type: 'range', path: 'symbol.gapBefore', label: 'Gap above', min: 0, max: 60, step: 0.5, unit: 'mm' },
+      { type: 'range', path: 'symbol.gapAfter', label: 'Gap below', min: 0, max: 60, step: 0.5, unit: 'mm' },
+      { type: 'hint', label: 'Symbols are solid shapes, which is what engraves cleanly on slate — fine interior linework disappears into the grain.' },
     ],
   },
   {
@@ -358,6 +371,47 @@ function buildControl(spec) {
       break;
     }
 
+    case 'symbols': {
+      const host = el('div');
+      const buttons = new Map();
+
+      for (const group of SYMBOL_GROUPS) {
+        host.append(el('div', {
+          className: 'hint',
+          textContent: group,
+          style: 'margin:10px 0 5px;color:var(--ink-faint);letter-spacing:.1em;text-transform:uppercase',
+        }));
+
+        const grid = el('div', { className: 'symbol-grid' });
+        for (const sym of SYMBOLS.filter((s) => s.group === group)) {
+          const button = el('button', { className: 'symbol-swatch', type: 'button', title: sym.name });
+          // The swatch is the real geometry, so the picker cannot show one
+          // thing and the plaque engrave another.
+          button.innerHTML =
+            `<svg viewBox="${symbolViewBox(sym.id)}" aria-label="${sym.name}">` +
+            `<path d="${sym.d}" fill="currentColor" fill-rule="nonzero"/></svg>`;
+          button.addEventListener('click', () => {
+            set(state.design, 'symbol.id', sym.id);
+            set(state.design, 'symbol.on', true);
+            update();
+          });
+          grid.append(button);
+          buttons.set(sym.id, button);
+        }
+        host.append(grid);
+      }
+
+      wrap.append(host);
+      updaters.push(() => {
+        const current = get(state.design, 'symbol.id');
+        for (const [id, button] of buttons) {
+          button.setAttribute('aria-pressed', String(id === current));
+        }
+        show();
+      });
+      break;
+    }
+
     case 'swaps': {
       const box = el('div', { className: 'swaps' });
       wrap.append(box);
@@ -530,6 +584,65 @@ function draw() {
   $('#loading').hidden = true;
 }
 
+// ── Reset ──────────────────────────────────────────────────────────────────
+
+let toastTimer;
+
+function hideToast() {
+  clearTimeout(toastTimer);
+  $('#toast').hidden = true;
+}
+
+function toast(message, actionLabel, action) {
+  const host = $('#toast');
+  host.textContent = '';
+  host.append(el('span', { textContent: message }));
+
+  if (action) {
+    const button = el('button', { className: 'btn btn--sm', type: 'button', textContent: actionLabel });
+    button.addEventListener('click', () => { action(); hideToast(); });
+    host.append(button);
+  }
+
+  host.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hideToast, 10000);
+}
+
+function syncTopbar() {
+  $('#collection').value = state.ui.collection;
+  for (const b of $('#translation').children) {
+    b.setAttribute('aria-pressed', String(b.dataset.value === state.design.translation));
+  }
+}
+
+/**
+ * Back to factory settings in one click.
+ *
+ * Offering undo rather than a confirmation dialog keeps it a single click for
+ * the case that is actually common — wanting the defaults back — while still
+ * being recoverable when it was a misclick.
+ */
+function resetToDefaults() {
+  const previous = clone(state.design);
+  const previousCollection = state.ui.collection;
+
+  state.design = DEFAULT_DESIGN();
+  state.ui.collection = 'household';
+
+  syncTopbar();
+  update();
+  renderVerseList();
+
+  toast('Reset to defaults.', 'Undo', () => {
+    state.design = previous;
+    state.ui.collection = previousCollection;
+    syncTopbar();
+    update();
+    renderVerseList();
+  });
+}
+
 // ── Persistence ────────────────────────────────────────────────────────────
 
 const persist = () => {
@@ -697,6 +810,8 @@ function wireTopbar() {
     writeStore(store);
     update();
   });
+
+  $('#btn-reset').addEventListener('click', resetToDefaults);
 
   $('#btn-open').addEventListener('click', () => { renderSaved(); $('#dlg-open').showModal(); });
 
