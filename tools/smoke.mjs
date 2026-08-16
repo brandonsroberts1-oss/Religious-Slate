@@ -212,6 +212,56 @@ check('reset restores every default in one click',
 check('reset offers a working undo', resetBehaviour.hadUndo && resetBehaviour.restored === 44,
   `restored ${resetBehaviour.restored}`);
 
+// Both reset entry points must work, and the reset has to reach the rendered
+// preview — not merely the state object. Checking state alone would pass even
+// if the whole panel had stopped updating.
+const panelReset = await page.evaluate(async () => {
+  const s = window.__studio;
+  // Each render namespaces its SVG ids with a fresh serial, so compare the
+  // geometry with those normalised away.
+  const preview = () => document.querySelector('#board svg').outerHTML.replace(/sp\d+/g, 'ns');
+
+  s.state.design = s.withDefaults({});
+  s.update();
+  await new Promise((r) => setTimeout(r, 350));
+  const baseline = preview();
+
+  s.state.design.verse.sizeMm = 41;
+  s.state.design.verse.font = 'anton';
+  s.state.design.badge.box.thicknessMm = 6;
+  s.update();
+  await new Promise((r) => setTimeout(r, 350));
+  const changed = preview();
+
+  const button = document.querySelector('#controls .btn--reset');
+  if (!button) return { error: 'no reset button in the controls panel' };
+  button.click();
+  await new Promise((r) => setTimeout(r, 400));
+
+  return {
+    differed: changed !== baseline,
+    restored: preview() === baseline,
+    slider: document.querySelector('#controls input[type=range]').value,
+  };
+});
+check('panel reset restores the rendered preview, not just state',
+  panelReset.differed && panelReset.restored && panelReset.slider === '18',
+  JSON.stringify(panelReset));
+
+// The chosen collection belongs to the document, so a reopened design reports
+// the style it was actually built in.
+const collectionPersists = await page.evaluate(async () => {
+  const s = window.__studio;
+  const sel = document.getElementById('collection');
+  sel.value = 'grace';
+  sel.dispatchEvent(new Event('change', { bubbles: true }));
+  await new Promise((r) => setTimeout(r, 200));
+  const saved = JSON.parse(localStorage.getItem('sps.last') || '{}');
+  return { inDesign: s.state.design.collection, inStorage: saved.collection };
+});
+check('collection is saved with the design', collectionPersists.inDesign === 'grace' && collectionPersists.inStorage === 'grace',
+  JSON.stringify(collectionPersists));
+
 // Every font in the book must parse and outline.
 const fontIssues = await page.evaluate(async () => {
   const s = window.__studio;

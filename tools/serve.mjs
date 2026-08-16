@@ -60,7 +60,13 @@ async function handle(req, res) {
 
     res.writeHead(200, {
       'Content-Type': TYPES[path.extname(target)] || 'application/octet-stream',
-      'Cache-Control': 'no-cache',
+      // no-store, not no-cache: no-cache still lets the browser keep a copy,
+      // and with no ETag to revalidate against it can go on serving a stale
+      // module. That produces the worst kind of bug — fresh HTML rendering a
+      // new control while cached JS runs without the handler behind it, so the
+      // button is there and does nothing.
+      'Cache-Control': 'no-store, max-age=0',
+      Pragma: 'no-cache',
     });
     res.end(body);
   } catch {

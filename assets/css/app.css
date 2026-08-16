@@ -104,6 +104,13 @@ body {
 }
 .board-shell svg { height: 100%; width: auto; max-width: 100%; display: block; }
 
+@keyframes board-flash {
+  0%   { filter: drop-shadow(0 0 0 rgba(201, 162, 39, 0)); }
+  25%  { filter: drop-shadow(0 0 14px rgba(201, 162, 39, 0.85)); }
+  100% { filter: drop-shadow(0 0 0 rgba(201, 162, 39, 0)); }
+}
+.board-shell.flash { animation: board-flash 0.7s ease-out; }
+
 /* ── Controls ──────────────────────────────────────────────────────────── */
 
 .section {
@@ -224,6 +231,24 @@ input[type="range"]::-moz-range-thumb {
 }
 .btn--primary:hover { background: #d8b02f; border-color: #d8b02f; }
 .btn--ghost { background: transparent; }
+
+/* Reset reads as a real action rather than another quiet toolbar item. */
+.btn--reset {
+  width: 100%;
+  justify-content: center;
+  padding: 9px 12px;
+  background: #33272a;
+  border-color: #6a4038;
+  color: #f0b7a4;
+  font-weight: 600;
+}
+.btn--reset:hover { background: #3d2d30; border-color: #8a5247; color: #ffd2c2; }
+
+.panel-head {
+  padding: 12px 14px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
 .btn--sm { padding: 4px 8px; font-size: 11.5px; }
 .btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
 .btn-row > .btn { flex: 1; }

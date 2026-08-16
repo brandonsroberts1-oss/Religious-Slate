@@ -73,6 +73,9 @@ export const DEFAULT_DESIGN = () => ({
   name: 'Peace Be To This House',
   verseId: 'luke-10-5',
   translation: 'kjv',
+  // Part of the document, not of the session: a reopened design has to know
+  // which house style it belongs to, or the picker reports the wrong one.
+  collection: 'household',
 
   board: {
     sizeId: 'plaque-8x1175',

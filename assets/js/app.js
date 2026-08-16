@@ -37,7 +37,7 @@ const LAST_KEY = 'sps.last';
 
 const state = {
   design: DEFAULT_DESIGN(),
-  ui: { search: '', filter: 'all', guides: false, flat: false, collection: 'household' },
+  ui: { search: '', filter: 'all', guides: false, flat: false },
 };
 
 const verseById = new Map(VERSES.map((v) => [v.id, v]));
@@ -184,6 +184,23 @@ function buildControls() {
   const host = $('#controls');
   host.textContent = '';
   updaters.length = 0;
+
+  // A reset lives where the settings are. Someone who has lost track of what
+  // they changed is looking at this panel, not at the toolbar.
+  const reset = el('button', {
+    className: 'btn btn--reset',
+    type: 'button',
+    textContent: 'Reset all settings to default',
+  });
+  reset.addEventListener('click', resetToDefaults);
+  host.append(el('div', { className: 'panel-head' }, [
+    reset,
+    el('div', {
+      className: 'hint',
+      textContent: 'Puts every typeface, size, thickness and spacing back to the original. Undo is offered afterwards.',
+      style: 'margin:7px 0 0',
+    }),
+  ]));
 
   for (const section of SECTIONS) {
     const body = el('div', { className: 'body' });
@@ -545,7 +562,17 @@ let pending = false;
 let renderToken = 0;
 
 function update() {
-  for (const fn of updaters) fn();
+  // One misbehaving control must not take the panel down with it. Without the
+  // guard, a single throw halts the loop, every control after it stops
+  // syncing, and the redraw below never runs — which looks to the operator
+  // like the app has stopped responding to anything at all.
+  for (const fn of updaters) {
+    try {
+      fn();
+    } catch (err) {
+      console.error('control failed to sync', err);
+    }
+  }
   scheduleDraw();
   persist();
 }
@@ -609,8 +636,21 @@ function toast(message, actionLabel, action) {
   toastTimer = setTimeout(hideToast, 10000);
 }
 
+/**
+ * Briefly outline the board. A reset on a design that was already close to
+ * default changes almost nothing on screen, and silence there is
+ * indistinguishable from a broken button.
+ */
+function flashBoard() {
+  const board = $('#board');
+  board.classList.remove('flash');
+  void board.offsetWidth; // restart the animation
+  board.classList.add('flash');
+  setTimeout(() => board.classList.remove('flash'), 700);
+}
+
 function syncTopbar() {
-  $('#collection').value = state.ui.collection;
+  $('#collection').value = state.design.collection;
   for (const b of $('#translation').children) {
     b.setAttribute('aria-pressed', String(b.dataset.value === state.design.translation));
   }
@@ -625,18 +665,19 @@ function syncTopbar() {
  */
 function resetToDefaults() {
   const previous = clone(state.design);
-  const previousCollection = state.ui.collection;
+  const previousCollection = state.design.collection;
 
   state.design = DEFAULT_DESIGN();
-  state.ui.collection = 'household';
+  state.design.collection = 'household';
 
   syncTopbar();
   update();
   renderVerseList();
+  flashBoard();
 
-  toast('Reset to defaults.', 'Undo', () => {
+  toast('Reset to defaults — fonts, sizes, spacing and thicknesses.', 'Undo', () => {
     state.design = previous;
-    state.ui.collection = previousCollection;
+    state.design.collection = previousCollection;
     syncTopbar();
     update();
     renderVerseList();
@@ -745,7 +786,7 @@ async function runBatch() {
       return { name: exportFilename(d, verse, 'svg'), text: toExportSvg(d, verse) };
     });
 
-    const label = safeName(state.ui.collection);
+    const label = safeName(state.design.collection);
     download(makeZip(files), `slate-plaques_${label}_${files.length}.zip`);
     $('#dlg-batch').close();
   } finally {
@@ -759,9 +800,9 @@ async function runBatch() {
 function wireTopbar() {
   const collections = $('#collection');
   for (const c of COLLECTIONS) collections.append(el('option', { value: c.id, textContent: c.name }));
-  collections.value = state.ui.collection;
+  collections.value = state.design.collection;
   collections.addEventListener('change', () => {
-    state.ui.collection = collections.value;
+    state.design.collection = collections.value;
     state.design = applyCollection(state.design, collections.value);
     update();
   });
@@ -823,7 +864,7 @@ function wireTopbar() {
       select.append(el('option', { value: c.id, textContent: c.name }));
     }
     select.append(el('option', { value: 'all', textContent: `Everything (${VERSES.length})` }));
-    select.value = state.ui.collection;
+    select.value = state.design.collection;
     const refresh = () => { $('#batch-count').textContent = `${batchVerses().length} verses match.`; };
     select.onchange = refresh;
     refresh();

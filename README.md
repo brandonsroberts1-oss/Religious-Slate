@@ -136,9 +136,20 @@ than its box, when a verse will not fit the text width, when a symbol is wider
 than the content area, and when a bottom-anchored footer has drifted under the
 stack.
 
-**Reset** in the toolbar restores every setting to its default in one click. It
-does not ask first — it offers an Undo instead, which is the right trade when
-wanting the defaults back is the common case and a misclick is the rare one.
+### Resetting
+
+**Reset all settings to default** sits at the top of the settings panel, and
+there is a smaller **Reset** in the toolbar. Either puts every typeface, size,
+letter-spacing, thickness, margin and gap back to the original plaque in one
+click. It does not ask first — it flashes the board, and offers an **Undo**,
+which is the right trade when wanting the defaults back is the common case and
+a misclick is the rare one.
+
+> **If a button ever appears to do nothing, hard-refresh once**
+> (Ctrl/Cmd + Shift + R). The server now sends `no-store`, but a browser that
+> cached an older `app.js` before that change can render new markup while
+> running old code — the control appears with no handler behind it. One
+> refresh clears it permanently.
 
 ### Batch export
 
